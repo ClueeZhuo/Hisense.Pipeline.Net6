@@ -3,7 +3,7 @@ pool:
 
 variables:
   tagName: 'latest'
-  imageName: '$(dockerId)/Hisense.Pipeline.Net6:$(Build.BuildNumber)'
+  imageName: '$(dockerId)/$(imageName):$(Build.BuildNumber)'
 
 steps:
 
@@ -38,9 +38,9 @@ steps:
       echo 'success to pull image...'
      fi
 
-     containers=$(docker ps -q --filter name=Hisense.Pipeline.Net6)
+     containers=$(docker ps -q --filter name=$(imageName))
      if test -n "$containers"; then
-      docker stop $(docker ps -q --filter name=Hisense.Pipeline.Net6)
+      docker stop $(docker ps -q --filter name=$(imageName))
       rc=$?
       if [[ $rc != 0 ]];
       then
@@ -53,9 +53,9 @@ steps:
       echo 'none to stop container...'
      fi
      
-     containers1=$(docker ps -q -a --filter name=Hisense.Pipeline.Net6)
+     containers1=$(docker ps -q -a --filter name=$(imageName))
      if test -n "$containers1"; then
-      docker rm $(docker ps -q -a --filter name=Hisense.Pipeline.Net6)
+      docker rm $(docker ps -q -a --filter name=$(imageName))
       rc=$?
       if [[ $rc != 0 ]];
       then
@@ -68,7 +68,7 @@ steps:
       echo 'none to remove container...'
      fi
 
-     docker run -d -p 10103:80 --name Hisense.Pipeline.Net6 --mount source=Hisense.Pipeline.Net6_data,target=/app/log --restart=unless-stopped $(imageName)
+     docker run -d -p 10103:80 --name $(imageName) --mount source=$(imageName)_data,target=/app/log --restart=unless-stopped $(imageName)
      rc=$?
      if [[ $rc != 0 ]];
      then
@@ -93,9 +93,9 @@ steps:
       echo 'none to remove danglings images...'
      fi
 
-     oldimages=$(docker images clueezhuo/Hisense.Pipeline.Net6 -f "before=$(imageName)" -q)
+     oldimages=$(docker images clueezhuo/$(imageName) -f "before=$(imageName)" -q)
      if test -n "$oldimages"; then
-      docker rmi $(docker images clueezhuo/Hisense.Pipeline.Net6 -f "before=$(imageName)" -q)
+      docker rmi $(docker images clueezhuo/$(imageName) -f "before=$(imageName)" -q)
       rc=$?
       if [[ $rc != 0 ]];
       then
